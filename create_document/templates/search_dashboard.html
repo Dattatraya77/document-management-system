@@ -1,0 +1,309 @@
+{% extends 'layout1.html' %}
+{% load static %}
+
+{% block css %}
+	.m-fadeOut {
+	  visibility: hidden;
+	  opacity: 0;
+      height: 0px;
+	  line-height: 0px;
+	  padding: 0px;
+	  margin-bottom: 0px;
+	  transition: visibility 0s linear 1000ms, opacity 500ms;
+	}
+{% endblock %}
+
+{% block content %}
+
+<style>
+	.container-fluid {
+		padding-right: 15px !important;
+		padding-left: 0px !important;
+	}
+
+  #sidebar {
+	min-width: 55px;
+	max-width: 55px;
+	-webkit-transition: all 0.3s;
+	-o-transition: all 0.3s;
+	transition: all 0.3s;
+	text-align: center;
+  }
+
+  #sidebar.active ul.components li {
+	font-size: 14px;
+  }
+
+  #sidebar.active ul.components li a {
+	padding: 10px 0;
+  }
+
+  #sidebar.active ul.components li a span {
+	display: none;
+  }
+
+  #sidebar.active ul.components li:hover a span {
+	font-weight: bolder;
+	color: black;
+	display: block;
+	transition: 0.5s;
+	font-size: smaller;
+  }
+
+  #sidebar ul.components {
+	padding: 0;
+	-webkit-transition: 0.3s;
+	-o-transition: 0.3s;
+	transition: 0.3s;
+	height: 100vh;
+  }
+
+  #sidebar ul li {
+	font-size: 16px;
+  }
+
+  #sidebar ul li > ul {
+	margin-left: 10px;
+  }
+
+  #sidebar ul li > ul li {
+	font-size: 14px;
+  }
+
+  #sidebar ul li a {
+	padding: 10px 30px;
+	display: block;
+	color: white;
+	text-decoration: none;
+  }
+
+  #sidebar ul li a:hover {
+	color: black;
+	background-color: white;
+  }
+
+  #sidebar ul li a img {
+	width: 30px;
+	filter: invert(1);
+  }
+
+  #sidebar ul li:hover a img {
+	filter: invert(0);
+  }
+
+  @media (max-width: 991.98px) {
+	#sidebar ul li a span {
+	  display: block;
+	}
+  }
+
+  #sidebar ul li.active > a {
+	background: transparent;
+	color: #fff;
+  }
+
+  @media (max-width: 991.98px) {
+	#sidebar {
+	  min-width: 55px;
+	  max-width: 55px;
+	  text-align: center;
+	  margin-left: -80px !important;
+	}
+
+	#sidebar.active {
+	  margin-left: 0 !important;
+	}
+  }
+
+  @media (max-width: 991.98px) {
+	#sidebarCollapse span {
+	  display: none;
+	}
+  }
+
+  /* --- card styles --- */
+
+  .small-box {
+	border-radius: 0.50rem;
+	box-shadow: 0 0 1px rgba(0, 0, 0, 0.125), 0 1px 3px rgba(0, 0, 0, 0.2);
+	display: block;
+	margin-bottom: 20px;
+	position: relative;
+	height:158px;
+  }
+
+  .small-box > .inner {
+	padding: 10px;
+  }
+
+  .small-box > .small-box-footer {
+	background: rgba(0, 0, 0, 0.1);
+	color: rgba(255, 255, 255, 0.8);
+	display: block;
+	padding: 8px 0;
+	position: relative;
+	text-align: center;
+	text-decoration: none;
+	z-index: 10;
+	top:6px;
+  }
+
+  .small-box > .small-box-footer:hover {
+	background: rgba(0, 0, 0, 0.15);
+	color: #fff;
+  }
+
+  .small-box h3 {
+	font-size: 2.2rem;
+	font-weight: 700;
+	margin: 0 0 10px 0;
+	padding: 0;
+	white-space: nowrap;
+  }
+
+  @media (min-width: 992px) {
+	.col-lg-3 .small-box h3 {
+	  font-size: 1.6rem;
+	}
+  }
+
+  @media (min-width: 1200px) {
+	.col-lg-3 .small-box h3 {
+	  font-size: 2.2rem;
+	}
+  }
+
+  .small-box p {
+	font-size: 1rem;
+  }
+
+  .small-box h3,
+  .small-box p {
+	z-index: 5;
+  }
+
+  .small-box .icon {
+	color: rgba(0, 0, 0, 0.15);
+	z-index: 0;
+  }
+
+  .small-box .icon > i {
+	font-size: 90px;
+	position: absolute;
+	right: 15px;
+	top: 15px;
+	transition: all 0.3s linear;
+  }
+
+  .small-box .icon > i.ion {
+	font-size: 70px;
+	top: 20px;
+  }
+
+  .small-box:hover {
+	text-decoration: none;
+	border: 1px solid #a7a7a7;
+  }
+
+  .small-box:hover .icon > i {
+	font-size: 95px;
+  }
+
+  .small-box:hover .icon > i.ion {
+	font-size: 75px;
+  }
+  .btn-sm{
+	padding:0.25rem -0.5rem;
+	line-height:1.5;
+	border-radius:1.2rem;
+	font-size: 13px;
+  }
+  .slow .toggle-group {
+  	transition: left 0.7s;
+  	-webkit-transition: left 0.7s;
+  }
+  .maintenance-text{
+    height: 40px;
+    text-align: right;
+  }
+
+</style>
+
+	<div class="container">
+	  <div class="row pt-4"></div>
+
+	  <div class="row p-1 mx-1" style="background-color: #f4f4f4;display: flex;justify-content:space-between;">
+		  <div class="col d-flex justify-content-left">
+			  <h5 class="mt-1">Welcome {{ user.username }}!</h5>
+		  </div>
+	  </div>
+
+	  <div class="row mt-3" style="margin-top:30px !important;">
+
+		<div class="col-lg-3">
+		  <div class="shadow-lg small-box text-white bg-warning">
+			<div class="inner">
+			  <h3 style="color:white">{{ template_doc }}</h3>
+
+			  <p>Templates</p>
+			</div>
+			<div class="icon"><i class="fas fa-file-word" aria-hidden="true"></i></div>
+
+			  <div class="shadow-lg small-box-footer">
+				  <div class="row">
+					  <div class="col">
+						  <a href="#" onclick="loader('show');" class="text-white">Docx <i class="fa fa-arrow-circle-right"></i></a>
+					  </div>
+					  <div class="col">
+						  <a href="#" onclick="loader('show');" class=" text-white" >List <i class="fa fa-arrow-circle-right"></i></a>
+					  </div>
+				  </div>
+
+			  </div>
+		    </div>
+		</div>
+
+		<div class="col-lg-3">
+		  <div class="shadow-lg small-box text-white bg-primary">
+			<div class="inner">
+			  <h3 style="color:white">{{ created_doc }}</h3>
+
+			  <p>Created Documents</p>
+			</div>
+			<div class="icon"><i class="fas fa-file-medical" aria-hidden="true"></i></div>
+
+			  <div class="shadow-lg small-box-footer">
+				  <div class="row">
+					  <div class="col">
+						  <a href="#" onclick="loader('show');" class="text-white">Docx <i class="fa fa-arrow-circle-right"></i></a>
+					  </div>
+					  <div class="col">
+						  <a href="#" onclick="loader('show');" class=" text-white" >List <i class="fa fa-arrow-circle-right"></i></a>
+					  </div>
+				  </div>
+
+			  </div>
+
+		  </div>
+		</div>
+
+	  {% if user.is_staff == True %}
+		<div class="col-lg-3">
+		  <div class="shadow-lg small-box text-white bg-secondary">
+			<div class="inner">
+			  <h3 style="color:white">{{ total_user }}</h3>
+			  <p>Active Users</p>
+			</div>
+			<div class="icon"><i class="fas fa-users"></i></div>
+			<a href="{% url 'view-all-users' %}" onclick="loader('show');" class="small-box-footer text-white">More info <i class="fa fa-arrow-circle-right"></i></a>
+		  </div>
+		</div>
+	  {% endif %}
+	  </div>
+	</div>
+
+{% endblock %}
+
+{% block extracode %}
+
+{% endblock %}

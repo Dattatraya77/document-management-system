@@ -1,0 +1,107 @@
+{% extends 'layout1.html' %}
+{% load static %}
+{% load tz %}
+{% block content %}
+<style>
+    .container-fluid {
+        padding-right: 15px !important;
+        padding-left: 0px !important;
+    }
+
+    .dropzone {
+        min-height: 250px;
+        background: white;
+        padding: 25px 54px;
+        border: 2px dashed #0087F7;
+        border-radius: 5px;
+    }
+
+    .dragover {
+        border-color: black;
+        background-color: whitesmoke;
+        box-shadow: inset 0px 0px 15px 0px #5252527d;
+    }
+
+    .buttons-html5 {
+    padding:1px 6px !important;
+    }
+
+    div.scroll {
+        margin:4px, 4px;
+        padding:4px;
+        background-color: steel;
+        width: 400px;
+        height: 125px;
+        overflow-x: hidden;
+        overflow-y: auto;
+        text-align:justify;
+
+    }
+    .btn-sm{
+        padding:0.25rem -0.5rem;
+        line-height:1.5;
+        border-radius:1.2rem;
+        font-size: 13px;
+    }
+    .default-home-page-btn {
+        padding:0.25rem 0.5rem;
+        line-height:1.0rem;
+        border-radius:0.5rem;
+        font-size: 13px;
+    }
+
+</style>
+<div class="container">
+    <div class="d-flex justify-content-center ">
+        <div class="user_card" style="width:70vw;">
+            <div class="d-flex justify-content-left mt-5">
+                <h5 id="form-title">Create Document Using Existing Template</h5>
+            </div><br>
+
+            <div class="d-flex justify-content-center form_container">
+                <div class="table-responsive">
+                    <table id="example" class="table table-bordered table-striped" data-order='[[ 0, "desc" ]]'>
+                        <thead>
+                            <tr align="center">
+                                <th>Template ID</th>
+                                <th>Template Name</th>
+                                <th>Template Description</th>
+                                <th>Template Type</th>
+                                <th>Created By</th>
+                                <th>Updated On</th>
+<!--                                <th style="width:80px;">Action</th>-->
+                                <th style="width:80px;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody style="color: black">
+                            {% for item in template_list %}
+                                <tr>
+                                    <td>{{ item.temp_id }}</td>
+                                    <td style ="word-break:break-all;">{% if item.temp_title %}{{ item.temp_title }}{% endif %}</td>
+                                    <td style ="word-break:break-all;">{% if item.temp_description %}{{ item.temp_description }}{% endif %}</td>
+                                    <td>{% if item.template_flag %}{{ item.template_flag }}{% endif %}</td>
+                                    <td>{% if item.temp_owner %}{{ item.temp_owner.username }}{% endif %}</td>
+                                    <td>{% if item.temp_edited_on %}{{ item.temp_edited_on | timezone:time_zone }}{% endif %}</td>
+                                    <td align="center">
+                                        <a href="{% url 'createDocumentTemplate' item.temp_id %}" class="btn btn-sm btn-primary rounded-pill py-1">
+                                            <i class="fas fa-plus-circle pr-2"></i>Create
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+
+                    </table>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extracode %}
+    <script src="{% static 'custom/js/default_home_page_after_login.js' %}?version=1" type="text/javascript"></script>
+{% endblock %}

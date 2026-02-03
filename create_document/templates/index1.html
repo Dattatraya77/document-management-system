@@ -1,0 +1,295 @@
+{% extends 'layout1.html' %}
+{% load static %}
+{% load tz %}
+{% block content %}
+
+<style>
+    .container-fluid {
+        padding-right: 15px !important;
+        padding-left: 0px !important;
+    }
+
+    .dropzone {
+        min-height: 250px;
+        background: white;
+        padding: 25px 54px;
+        border: 2px dashed #0087F7;
+        border-radius: 5px;
+
+    }
+
+    .dragover {
+        border-color: black;
+        background-color: whitesmoke;
+        box-shadow: inset 0px 0px 15px 0px #5252527d;
+    }
+
+    .buttons-html5 {
+        padding:1px 6px !important;
+    }
+
+    .selected-file-chip{
+       font-size: 15px;
+        background: #cffffd;
+        padding: 5px 15px;
+        border-radius: 15px;
+        font-weight: bold;
+    }
+
+    .btn-sm{
+        padding:0.25rem -0.5rem;
+        line-height:1.5;
+        border-radius:1.2rem;
+        font-size: 13px;
+    }
+
+    .btn-group{
+        padding:0.rem 0.rem;
+        line-height:0.5;
+        border-radius:0rem;
+        font-size: 15px;
+    }
+    .dropdown-menu {
+        min-width:15rem;
+        padding:0.3rem 2px;
+        margin:0.125rem -123px 0px;
+    }
+    sub {
+        bottom : 0.1em;
+    }
+
+</style>
+
+<div class="container-fluid p-0">
+    <form method="post" action="" enctype="multipart/form-data" novalidate="" class="box has-advanced-upload">
+        {% csrf_token %}
+        <input type="text" value="{{ temp_id }}" hidden name="temp_id">
+        <div class="row justify-content-center mt-5">
+            <div class="col-12 text-center">
+                <h5><strong>Train Template</strong></h5>
+            </div>
+
+            <div class="col-lg-7 dropzone">
+                <div class="row justify-content-center h-100">
+                    <div class="col-md-2 col-lg-2 col-sm-12 my-auto">
+                        <img src="/media/profile_pics/file_upload.png" alt="" class="" style="width: 100px;">
+                    </div>
+
+                    <div class="col-10 text-center my-auto">
+                        <img src="/media/profile_pics/file_upload_arrow.png" alt="" width="30px" class="d-inline mr-2">
+                        <h5 class="mt-4 d-inline">Drop your file (.docx) or <a href="#" id="alt-select-file">click here to select file</a></h5>
+                        <h6 class="mt-2" id="upload-hint">Supported file format - docx</h6>
+                        <input type="file" name="files" id="file-input" class="form-control p-1 d-none" accept=".doc,.docx">
+                        <span class="selected-file-chip d-none" id="file-help"></span>
+                    </div>
+
+                    <div class="col-4 my-auto" id="upload-btn">
+                        <button class="btn btn-sm btn-block btn-outline-primary" type="submit" id="upload" disabled>Train Template</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="box__uploading">Uploading…</div>
+        <div class="box__success">Done! <a href="{% url 'train-docx-template' %}" class="box__restart" role="button">Upload more?</a></div>
+        <div class="box__error">Error! <span></span>. <a href="{% url 'train-docx-template' %}" class="box__restart" role="button">Try again!</a></div>
+        <input type="hidden" name="ajax" value="1">
+    </form>
+</div>
+
+
+<!-- Modal for new template description-->
+        <button type="button" hidden class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter" id="openTempDescModal">
+          Launch demo modal
+        </button>
+        <form action="{% url 'AddTemplateDetails' %}" method="post" id="modalForm">
+            {% csrf_token %}
+            <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog"
+                 aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLongTitle">Template Description</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+
+                      <div class="modal-body">
+
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label for="title">Template Title</label>
+                                    <input type="text" id="title" name="title" class="form-control" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label for="description">Template Description</label>
+                                  <textarea name="description" id="description" cols="30" rows="5" class="form-control"
+                                    required></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="form-group">
+                                {% if user_groups %}
+                                    <label class="pb-2">Template Groups:</label>
+                                    <br>
+
+                                        <div class="scroll form-group">
+                                            <select multiple class="mul-select" name="group_select">
+                                                {% for group in user_groups %}
+                                                <option value="{{ group.name }}" class="form-control">{{ group.name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+
+                                {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                              <button type="submit" class="btn btn-block btn-md btn-primary ">Save</button>
+                            </div>
+                          </div>
+
+                      </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <!-- model for view template -->
+        <div class="modal fade"
+             id="loading"
+             data-backdrop="static"
+             data-keyboard="false"
+             tabindex="-1"
+             aria-labelledby="staticBackdropLabel">
+
+
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title"></h5>
+                       <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                       </button>
+                    </div>
+                    <iframe
+                        id="document_viewer"
+                        style="width:100%; height:80vh; border:none;"
+                    ></iframe>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="container  mt-5" >
+            <div class="d-flex justify-content-center ">
+                <div class="user_card" style="width:80vw;">
+                    <div class="d-flex justify-content-left">
+                        <h5 id="form-title">Recently Trained Template List</h5>
+                    </div><br>
+
+                    <div class="d-flex justify-content-center form_container">
+                        <div class="table-responsive">
+                            <table id="example" class="table table-bordered table-striped " data-order='[[ 0, "desc" ]]'>
+                                <thead>
+                                    <tr align="center">
+                                        <th>Template ID</th>
+                                        <th>Template Title</th>
+                                        <th>Description</th>
+                                        <th>Template Group</th>
+                                        <th>Created By</th>
+                                        <th>Updated On</th>
+                                        <th>Status</th>
+                                        <th style="width:70px;">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody style="color: black">
+                                     {% for template in template_doc_list %}
+                                    <tr>
+                                        <td>{{ template.temp_id }}</td>
+                                        <td style ="word-break:break-all;">{{ template.temp_title }}</td>
+                                        <td style ="word-break:break-all;">{{ template.temp_description }}</td>
+                                        <td>{{ template.display_group }}</td>
+                                        <td>{{ template.temp_owner.username }}</td>
+                                        <td>{{ template.temp_edited_on | timezone:time_zone }}</td>
+
+                                        <td>
+                                            {% if template.temp_status == 'ac' %}
+                                                <a href="" class="btn btn-success btn-sm" style="width:90px"><i class="far fa-check-circle pr-2"></i>Active</a>
+                                            {% elif template.temp_status == 'pe' %}
+                                                <a href="" class="btn btn-danger btn-sm" style="width:90px"><i class="fas fa-times-circle pr-2"></i>Pending</a>
+                                            {% endif %}
+                                        </td>
+                                        <td align="center">
+                                            <div class="btn-group dropleft" role="group" aria-label="First group" style="height:30px;">
+                                                <button title="Download Template" class="btn btn-outline-secondary btn-group px-2" onclick="downloadURI('{{ template.template }}','{{ template.temp_id }}')">
+                                                    <img src="/static/images/ms-word.png" width="20" height="20"/>
+                                                </button>
+                                                <button type="button" title="View Template" class="btn btn-outline-secondary btn-sm" onclick="set_preview('{{ template.template.url }}','{{ template.temp_id }}')">
+                                                    <img src="/static/images/view-file.png" width="20" height="20"/>
+                                                </button>
+                                                <button title="More Action" class="btn btn-outline-secondary btn-sm" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><i class="fas fa-ellipsis-v"></i></button>
+                                                <div class="dropdown-menu dropdown-content">
+                                                    <a class="dropdown-item" title="Delete Template" href="" data-toggle="modal" data-target="#{{ template.temp_id }}"><i class="fa fa-trash btn-outline-danger"></i><span class="pl-2"><sub>Delete</sub></span></a>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                        <div class="modal fade" tabindex="-1" id="{{ template.temp_id }}">
+                                            <div class="modal-dialog">
+                                              <div class="modal-content">
+                                                <div class="modal-header">
+                                                  <h4 class="modal-title">Delete Template</h4>
+                                                  <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: white">
+                                                    <span aria-hidden="true">&times;</span>
+                                                  </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                  <p>Are you sure you want to delete this template ?</p>
+                                                </div>
+                                                <div class="modal-footer">
+                                                  <button type="button" class="btn btn-outline-dark btn-sm" data-dismiss="modal"> <i class="fa fa-times pr-2"></i> Close</button>
+
+                                                    <a href="/delete-template/{{ template.temp_id }}" class="btn btn-outline-danger btn-sm">
+                                                        <i class="fa fa-trash pr-2"></i> Delete
+                                                    </a>
+
+                                                </div>
+                                              </div>
+
+                                            </div>
+
+                                        </div>
+                                    {% endfor %}
+                                </tbody>
+
+                            </table>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+
+{% endblock %}
+
+{% block extracode %}
+    <script src="{% static 'custom/js/file_upload1.js' %}?version=1" type="text/javascript"></script>
+    <script src="{% static 'custom/js/download_view_document.js' %}?version=1" type="text/javascript"></script>
+{% endblock %}

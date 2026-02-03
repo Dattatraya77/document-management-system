@@ -1,0 +1,99 @@
+<aside class="main-sidebar sidebar-dark-primary shadow-lg">
+
+    <div class="form-inline justify-content-center px-2">
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar sol-main-sidebar">
+      <!-- Sidebar Menu -->
+      <nav class="mt-2">
+        <ul class="nav nav-pills nav-sidebar flex-column nav-flat nav-compac nav-child-indent
+        nav-collapse-hide-child" data-widget="treeview" role="menu" data-accordion="false">
+
+          <li class="nav-item pt-2">
+            <a href="#" class="nav-link">
+              <img src="/media/profile_pics/home.png"  width="30px">
+              <p class="pl-2">Home<i class="right fas fa-angle-left"></i></p>
+            </a>
+            <ul class="nav nav-treeview">
+
+              <li class="nav-item">
+                <a href="{% url 'search_dashboard' %}" onclick="loader('show');" class="nav-link">
+                  <i class="fas fa-house-user nav-icon"></i>
+                  <p>Dashboard</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+
+
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <img src="/media/profile_pics/file-train.png" width="30px">
+              <p class="pl-2">Template Setup<i class="right fas fa-angle-left"></i></p>
+            </a>
+            <ul class="nav nav-treeview" >
+                <li class="nav-item">
+                  <a href="{% url 'train-docx-template' %}" onclick="loader('show');" class="nav-link">
+                    <i class="fas fa-file-word nav-icon"></i>
+                    <p>Train Docx</p>
+                  </a>
+                </li>
+
+            </ul>
+          </li>
+
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <img src="/media/profile_pics/add-file.png" width="30px">
+              <p class="pl-2">Create<i class="right fas fa-angle-left"></i></p>
+            </a>
+            <ul class="nav nav-treeview">
+
+                <li class="nav-item">
+                  <a href="{% url 'templates-to-doc' %}" onclick="loader('show');" class="nav-link">
+                    <i class="fas fa-list-alt nav-icon"></i>
+                    <p>Document</p>
+                  </a>
+                </li>
+
+            </ul>
+          </li>
+
+          {% if not sidebar_menu_permissions.System_Admin|default:False %}
+            {% if user.is_authenticated %}
+              {% if request.user.is_staff %}
+                <li class="nav-item">
+                  <a href="#" class="nav-link">
+                    <img src="/media/profile_pics/admin-settings.png" width="30px">
+                    <p class="pl-2">System Admin<i class="right fas fa-angle-left"></i></p>
+                  </a>
+                  <ul class="nav nav-treeview" >
+                    {% if not sidebar_menu_permissions.Group_Admin|default:False %}
+                      <li class="nav-item">
+                        <a class="nav-link" href="{% url 'create-show-user-group' %}" onclick="loader('show');">
+                          <i class="fas fa-layer-group nav-icon"></i>
+                          <p>Group Admin</p>
+                        </a>
+                      </li>
+                    {% endif %}
+                    {% if not sidebar_menu_permissions.User_Admin|default:False %}
+                      <li class="nav-item">
+                        <a class="nav-link" href="{% url 'add-show-user' %}" onclick="loader('show');">
+                          <i class="fas fa-user nav-icon"></i>
+                          <p>User Admin</p>
+                        </a>
+                      </li>
+                    {% endif %}
+                  </ul>
+                </li>
+              {% endif %}
+            {% endif %}
+          {% endif %}
+        </ul>
+      </nav>
+      <!-- /.sidebar-menu -->
+    </div>
+    <!-- /.sidebar -->
+  </aside>
+

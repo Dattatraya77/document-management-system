@@ -1,0 +1,303 @@
+{% extends 'layout1.html' %}
+{% load static %}
+{% block content %}
+
+        <style>
+          .seperate {
+                background-color: #e2e2e2
+            }
+            .table-responsive {
+                max-height: 350px;
+            }
+
+        </style>
+        <style>
+            .document-box {
+    font-family: "Times New Roman", Georgia, serif;
+    font-size: 15.5px;     /* 👈 closest to Word 12pt */
+    line-height: 1.55;     /* 👈 Word-like spacing */
+    color: #000;
+    padding: 30px 35px;
+    background-color: #ffffff;
+}
+.document-box strong,
+.document-box b {
+    font-weight: 700;
+}
+
+.document-box u {
+    text-decoration: underline;
+}
+
+.document-box em,
+.document-box i {
+    font-style: italic;
+}
+
+/* Sometimes docx2python injects inline styles */
+.document-box span[style*="font-weight"] {
+    font-weight: 700;
+}
+.document-box span[style*="underline"] {
+    text-decoration: underline;
+}
+.page-break {
+    height: 30px;
+    border-bottom: 1px dashed #ccc;
+    margin: 40px 0;
+}
+
+@media print {
+    .page-break {
+        page-break-before: always;
+        border: none;
+        margin: 0;
+        height: 0;
+    }
+}
+
+
+        </style>
+<style>
+/* Base metadata style */
+.meta {
+    padding: 2px 4px;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+/* Type-based colors */
+.meta-string   { background: #e7f1ff; color: #0d6efd; }
+.meta-number   { background: #fff3cd; color: #856404; }
+.meta-date     { background: #e2f0d9; color: #2f6b2f; }
+.meta-boolean  { background: #fce8e6; color: #b02a37; }
+.meta-choice   { background: #ede7f6; color: #5e35b1; }
+.meta-textarea { background: #f3f4f6; color: #374151; }
+.meta-image    { background: #ffe4e6; color: #9f1239; }
+
+/* Active metadata (current training) */
+.meta-active {
+    outline: 2px solid #000;
+}
+</style>
+
+        <script>
+            const exMetaKeys = {
+            {% for key in existing_meta_keys %}
+                "{{key.metadata_key}}" : ["{{key.metadata_type}}", "{{key.metadata_description}}"],
+            {% endfor %}
+            }
+        </script>
+
+
+        <div class="container-fluid" id="" style="padding-top: 23px;">
+
+        <div class="d-flex justify-content-between mt-3 px-5">
+            <div class="ml-4 ">
+
+                {% csrf_token %}
+				<span id="lastSpan" hidden>{{ last_span_id }}</span>
+                <input type="hidden" id="template_id" value="{{ template.temp_id }}">
+				<span id="last_span_id" hidden>{{ last_span_id }}</span>
+                <span id="first_span_id" hidden>{{ first_span_id }}</span>
+
+                <h3 class="d-inline mt-1"><strong>Train Metadata</strong></h3>
+            </div>
+
+            <div class="mx-auto" style="padding-left: 33rem;">
+                <div class="btn-group " role="group" aria-label="Basic example">
+                    <button type="button" id="nextPara" class="btn btn-outline-primary px-4" data-toggle="tooltip" data-placement="bottom" title="">
+                        <i class="fas fa-play-circle pr-2"></i>Start
+                    </button>
+
+                    <button type="button" id="saveMeta" class="btn btn-outline-secondary px-4" data-toggle="tooltip" data-placement="bottom" title="" disabled>
+                        <i class="fa fa-save pr-2"></i> Save
+                    </button>
+
+                    <button type="button" id="undoMeta" class="btn btn-outline-danger px-4" disabled>
+                        <i class="fa fa-undo pr-2"></i> Undo
+                    </button>
+
+                </div>
+
+                <span id="progressCounter" class="badge badge-info ml-3">
+                    0 / 0
+                </span>
+
+            </div>
+        </div>
+
+
+        <div class="row pl-5 ml-1">
+            <div class="col-7 border shadow py-3 overflow-auto" style="height: 75vh;">
+                <div class="document-box" id="document-box">
+                    {{ document_txt | safe }}
+                </div>
+
+            </div>
+
+            <div class="col-4 ml-4">
+                <form action="#">
+
+                    <div class="row my-3">
+                        <div class="col text-left">
+                            <h5><strong>Training Metadata :</strong> <span id="trainingMetaName"></span><br><strong class="text-info"><span id="existingFound"></span></strong></h5>
+                        </div>
+                    </div>
+                    <hr>
+
+                    <div class="row">
+                        <div class="col-12 text-left seperate">
+                            <div class="form-group">
+                                <label for="">Metadata Type</label>
+                                <select name="clause_type" class="form-control" id="metaType">
+								  <option value="string">String</option>
+                                  <option value="number">Number</option>
+                                  <option value="date">Date</option>
+                                  <option value="boolean">Boolean</option>
+                                  <option value="choice">Choice</option>
+                                  <option value="textarea">Textarea</option>
+                                  <option value="image">Image</option>
+                                </select>
+                                <small id="typeHelp" class="form-text text-muted">Mark the current select with as String, Number, Date etc.</small>
+                            </div>
+                        </div>
+                        <div class="col-12 text-left seperate">
+                            <div class="form-group">
+                                <label for="">Metadata Key</label>
+                                <input type="text" id="metaName" name="metaName" oninput="" class="form-control" disabled>
+                                <small id="labelHelp" class="form-text text-muted"></small>
+                            </div>
+
+                            <div class="scroll form-group" id="meta_choice_div" hidden>
+                                <label for="meta_key_choices">Metadata Key Choices</label><br>
+                                <select multiple class="mul-select" name="meta_select_choice" id="meta_key_choices">
+                                    {% for choice in metakey_choices %}
+                                        <option value="{{ choice }}" class="form-control">{{ choice.meta_choice }}</option>
+                                      {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-12 text-left seperate">
+                            <div class="form-group">
+                                <label for="">Metadata Description</label>
+                                <textarea type="text" name="mataText" id="mataText"  class="form-control"></textarea>
+                                <small id="textHelp" class="form-text text-muted">Enter the user friendly description for this metadata field</small>
+                            </div>
+                        </div>
+
+                        <div class="col-12 text-left seperate">
+                            <div class="form-group">
+                                <!-- Button trigger modal -->
+                                <button type="button" class="btn btn-primary btn-block" hidden data-toggle="modal" data-target="#exampleModal" id="openModalButton">
+                                  Submit
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </form>
+
+            </div>
+        </div>
+
+        </div>
+
+<!--Modal Added-->
+
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+             aria-hidden="true" style="min-width:1000px;">
+          <div class="modal-dialog modal-lg" role="document">
+              <form action="" method="post">{% csrf_token %}
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">MOT(Metadata Outside Template)</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <div class="modal-body">
+                      <div class="row d-flex justify-content-end pr-3">
+                          <div class="pt-2">
+                              <i style="color:grey" class="fas fa-search" aria-hidden="true"></i>
+                          </div>
+                          <div class="ml-1 pb-2 mr-3">
+                              <input id="myInput" type="text" class="form-control" placeholder="Filter Records" aria-controls="example">
+                          </div>
+                      </div>
+                      <div class="form-check table-responsive">
+                           <table class="table table-bordered table-striped" id="motTable">
+                              <thead>
+                                <tr>
+                                  <th><input type="checkbox" id="selectAll"></th>
+                                  <th>MOT Type</th>
+                                  <th>MOT Name</th>
+                                  <th>MOT Description</th>
+                                </tr>
+                              </thead>
+
+                                <tbody id="myTable">
+                                 {% for mot in existing_meta_keys %}
+                                    {% if mot.m_o_t %}
+                                    <tr>
+                                      <td><input type="checkbox" id="{{ mot.metadata_key }}" name="m_o_t" value="{{ mot.metadata_key }}"
+                                                 style="margin-left:7px;"></td>
+                                      <td>{{ mot.metadata_type }}</td>
+                                      <td>{{ mot.metadata_key }}</td>
+                                      <td>{{ mot.metadata_description }}</td>
+                                    </tr>
+                                    {% endif %}
+                                 {% endfor %}
+                                </tbody>
+                            </table>
+                      </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="saveMotButton">Save changes</button>
+                  </div>
+                </div>
+              </form>
+          </div>
+        </div>
+{% endblock %}
+{% block extracode %}
+    <script src="{% static 'custom/js/trainingMeta.js' %}?version=7" type="text/javascript"></script>
+    <script>
+        $(document).ready(function(){
+
+            $('#sidebar').addClass('collapse');
+            $('body').on('click', '#selectAll', function () {
+          if ($(this).hasClass('allChecked')) {
+             $('input[type="checkbox"]', '#motTable').prop('checked', false);
+          } else {
+           $('input[type="checkbox"]', '#motTable').prop('checked', true);
+           }
+           $(this).toggleClass('allChecked');
+        });
+       });
+
+
+        $(document).ready(function(){
+          $('aside.main-sidebar').addClass('hide-sidebar-2')
+        })
+
+        $('.pushmenu').on('click',function(){
+          $('aside.main-sidebar').toggleClass("hide-sidebar-2");
+          //if( $('aside.main-sidebar').hasClass('hide-sidebar-2') ){}
+        })
+
+
+    </script>
+    <script>
+        $(document).ready(function(){
+          $("#myInput").on("keyup", function() {
+            var value = $(this).val().toLowerCase();
+            $("#myTable tr").filter(function() {
+              $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+          });
+        });
+    </script>
+{% endblock %}

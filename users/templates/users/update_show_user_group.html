@@ -1,0 +1,84 @@
+{% extends "layout1.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block content %}
+
+<style>
+    .container-fluid {
+        padding-right: 15px !important;
+        padding-left: 0px !important;
+    }
+    .selector select {
+        width : 380px;
+        height : 20.8em;
+        font-size : smaller;
+    }
+    .select.form-control[multiple], select.form-control[size] {
+        height : auto !important;
+    }
+    ul.errorlist {
+        display:none;
+    }
+
+</style>
+
+<body class="" style="background-color: #fafafa;">
+    <div class="container">
+        <div class="row">
+            <div class="col-4">
+                <div class="mt-4">
+                    <div class="card" style="width: 25rem;">
+                        <div class="card-header bg-light text-dark font-weight-bold">
+                            <i class="fas fa-key pr-2"></i> Update Group
+                        </div>
+                        {% if g_form.errors %}
+                            {% for field in g_form %}
+                                {% for error in field.errors %}
+                                    <div class="alert alert-danger alert-dismissible" role="alert">
+                                        <button type="button" class="close" data-dismiss="alert">&times;</button>
+                                        <strong>{{ error|escape }}</strong>
+                                    </div>
+                                {% endfor %}
+                            {% endfor %}
+                            {% for error in g_form.non_field_errors %}
+                                <div class="alert alert-danger alert-dismissible" role="alert">
+                                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                                    <strong>{{ error|escape }}</strong>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+
+                        <div class="card-body">
+                            <form method="POST" enctype="multipart/form-data" class="mt-3">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    {{ g_form.as_p }}
+                                </div>
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-sm-6 ">
+                                            <button class="btn btn-primary" type="submit">Update</button>
+                                        </div>
+                                        <div class="col-sm-6 d-flex justify-content-end">
+                                            <a title="Back to show group information" href="{% url 'create-show-user-group' %}" class="btn btn-secondary">Back</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script>
+    var form_fields = document.getElementById('id_name')
+    form_fields.placeholder='Please enter group name here...';
+    form_fields.className = ' form-control border-primary'
+
+    var error_field = document.getElementsByClassName('errorlist')
+    error_field.className = ' d-none'
+</script>
+{% endblock content %}

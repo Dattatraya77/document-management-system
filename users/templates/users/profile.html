@@ -1,0 +1,248 @@
+{% extends "layout1.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block content %}
+
+<style>
+    .container-fluid {
+        padding-right: 15px !important;
+        padding-left: 0px !important;
+    }
+    .btn{
+        background-color:#007bff;
+        color:#fff;
+    }
+    .card {
+        box-shadow: 0 0.15rem 1.75rem 0 rgb(33 40 50 / 15%);
+    }
+    body {
+        background-color:#f2f6fc!important;
+        color:#69707a!important;
+    }
+    .select_country_code {
+        width: 240px;
+    }
+    .select2-container .select2-selection--single {
+        height:38px;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height:38px;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height:38px;
+    }
+    .select2-results__options{
+        font-size:14px !important;
+    }
+    .select2-results__placeholders{
+        font-size:11px !important;
+    }
+    .swal2-popup {
+        width: 22em;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__clear {
+        height:35px;
+    }
+    input#enter_otp.form-control.enter-otp {
+        width:240px;
+    }
+
+</style>
+
+<body class="" style="background-color: #fafafa;">
+<div class="container" style="margin-left:155px;">
+    <form method="POST" enctype="multipart/form-data" class="mt-3">{% csrf_token %}
+        <div class="row">
+            <div class="col-4">
+                <div class="mt-4">
+                    <div class="card" style="width: 25rem;">
+                        <div class="card-header bg-light text-dark font-weight-bold">
+                            <i class="fas fa-user-circle"></i> Profile Picture
+                        </div>
+                        <div class="card-body" style="height:487px;">
+                            <div class="row py-2 d-flex justify-content-center">
+                                <div class="col-sm-10">
+                                    {% if user.profile.image %}
+                                    <img style="margin-left:75px;" class="rounded-circle" src="{{ user.profile.image.url }}" width="120px;" height="">
+                                    {% endif %}
+                                    <h2 class="account-heading">
+                                        <strong style ="word-break:break-all;">
+                                            {{ user.username }}
+                                        </strong>
+                                    </h2>
+
+                                    <h6 class="text-secondary">{{ user.email }}</h6>
+                                    <div class="form-group text-left">
+                                        {{ p_form.image }}
+                                    </div>
+                                    <div class="form-group text-left">
+                                        <div class="row" style="width:100%;display:flex;justify-content:space-left;">
+
+                                            <div style="padding:0px;margin:0px;margin-left:17px;" >
+                                                Remove Profile Picture:
+                                            </div>
+                                            <input name="check_profile_picture_remove_or_not" style="padding:0px;margin:0px;width:13px;height:13px;margin-left:10px;margin-top:7px;" type="checkbox" >
+
+                                        </div>
+                                        <div class="row pl-3 pt-2">
+                                            <a href="/change-user-password-profile/{{ user.id }}/" class="btn btn-primary text-white" title="Click here to change password">
+                                                <i class="fa fa-key pr-2"></i>Change Password
+                                            </a>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="mt-4">
+                    <div class="card" style="width: 35rem; margin-left:50px;">
+                        <div class="card-header bg-light text-dark font-weight-bold">
+                            <i class="fas fa-address-card"></i> User Profile Details
+                        </div>
+                        <div class="card-body">
+
+                            <div class="row py-4">
+
+                                <div class="col-sm-12">
+                                    <div class="form-group text-left" title="Click here to change username">
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">
+                                                    <span class="fa fa-user">
+                                                    </span>
+                                                </span>
+                                            </div>
+                                            {{ u_form.username }}
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group text-left" title="Click here to change email">
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">
+                                                    <span class="fa fa-envelope">
+                                                    </span>
+                                                </span>
+                                            </div>
+                                            {{ u_form.email }}
+                                        </div>
+                                    </div>
+
+
+
+                                    <div class="form-group text-left">
+                                        <div class="row">
+                                             <div class="col-3">
+                                                 <input title="Click here to get your timezone" type="button" name="getTimezone" value="Time Zone" id="findtz" class="btn btn-primary">
+                                             </div>
+                                             <div class="col-9">
+                                                 {{ p_form.client_tz }}
+                                             </div>
+                                        </div>
+
+                                    </div>
+
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="row">
+
+                                <div class="col-sm-4">
+                                    <button title="Click here to save changes" class="btn btn-primary btn-block" type="submit">Save Changes</button>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+<script type="text/javascript">
+    let u = document.getElementById('id_username');
+    u.setAttribute('placeholder', 'Username');
+    let p = document.getElementById('id_email');
+    p.setAttribute('placeholder', 'Email address');
+    let s = document.getElementById('id_client_tz');
+
+
+    u.classList.add('form-control');
+    p.classList.add('form-control');
+    s.classList.add('form-control');
+
+
+
+    function geoFindMe() {
+
+        function success(position) {
+            const latitude  = position.coords.latitude;
+            const longitude = position.coords.longitude;
+            console.log("latitude:->",latitude);
+            console.log("longitude:->",longitude);
+
+            $.ajax({
+            type:'GET',
+            data: {
+                'latitude': latitude,
+                'longitude': longitude
+            },
+            url: "/get-timezone/",
+            success: function (response) {
+                if (response['success']) {
+                    console.log('Ajax got sent');
+                    // change the option to the response value
+                    $("#id_client_tz").val(response['tz']);
+                    } else {
+                        alert('Error, try again!' + response['error']);
+                        window.location.reload();
+                     }
+                },
+            error: function (response) {
+                alert('Error, try again!' + response['error']);
+                window.location.reload();
+                }
+            });
+
+        }
+
+        function error() {
+            console.log('Unable to retrieve location');
+        }
+
+        if(!navigator.geolocation) {
+            console.log('Geolocation is not supported by your browser');
+        } else {
+            console.log('locating..');
+            navigator.geolocation.getCurrentPosition(success, error);
+        }
+    }
+
+    document.querySelector('#findtz').addEventListener('click', geoFindMe);
+</script>
+
+</body>
+<script src="{% static 'custom/js/add_whatsapp_mobile_number.js' %}?version=1" type="text/javascript"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $("#id_client_tz").select2();
+
+        $('#country_code_id').on('select2:select', function (e) {
+            $("#select_country_code_error").html('');
+        });
+    });
+</script>
+
+{% endblock content %}

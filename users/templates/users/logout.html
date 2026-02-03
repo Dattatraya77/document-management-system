@@ -1,0 +1,57 @@
+{% extends "users/user_layout.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+<style>
+    .container-fluid {
+        padding-right: 15px !important;
+        padding-left: 15px !important;
+    }
+
+    .separator {
+        display: flex;
+        align-items: center;
+        text-align: center;
+    }
+
+    .separator::before,
+    .separator::after {
+        content: '';
+        flex: 1;
+        border-bottom: 1px solid rgb(128, 128, 128);
+    }
+
+    .separator::before {
+        margin-right: .25em;
+    }
+
+    .separator::after {
+        margin-left: .25em;
+    }
+</style>
+
+<body class="" style="background-color: #fafafa;">
+    <div class="container-fluid p-0">
+        <div class="row justify-content-center pt-5">
+            <div class="col-lg-4 justify-content-center text-center">
+                <h3 class="mb-4 mt-5">Logged out</h3>
+                <hr>
+                <p>Thanks for spending some quality time with DMS today.</p>
+                <a href="{% url 'login' %}" class="text-bold">Login again</a>
+                <hr>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+    </script>
+</body>
+{% endblock content %}
+
+
+
+
+
+
+

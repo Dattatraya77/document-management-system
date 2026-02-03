@@ -1,0 +1,19 @@
+{% extends 'layout1.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+      <form class="ml-5 mt-5" method="POST">
+          {% csrf_token %}
+          <fieldset class="form-group">
+              <legend class="border-bottom mb-4"><h1 style="color: red">Delete User</h1></legend>
+                <h2 style="color: red">Are you sure you want to delete {{ user }} User ?</h2>
+          </fieldset>
+          <div class="form-group">
+              <button class="btn btn-danger" type="submit">Delete</button>
+          </div>
+      </form>
+      <a href="{% url 'view-all-users' %}"><button class="btn btn-outline-secondary" >Cancel</button></a>
+      <br><br><br><br><br><br><br><br><br><br>
+
+{% endblock content %}

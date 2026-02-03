@@ -1,0 +1,204 @@
+{% extends "users/user_layout.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block content %}
+
+<style>
+    .mybody {
+    background: #fafafa;
+    color: #333333;
+    margin-top: 0rem;
+
+    }
+    .container-fluid {
+        padding-right: 15px !important;
+        padding-left: 15px !important;
+    }
+
+    .separator {
+        display: flex;
+        align-items: center;
+        text-align: center;
+    }
+
+    .separator::before,
+    .separator::after {
+        content: '';
+        flex: 1;
+        border-bottom: 1px solid rgb(128, 128, 128);
+    }
+
+    .separator::before {
+        margin-right: .25em;
+    }
+
+    .separator::after {
+        margin-left: .25em;
+    }
+</style>
+
+<body class="mybody">
+    <div class="container-fluid p-0">
+        <div class="row">
+            <div class="col-lg-6 ">
+                <div class="row ">
+                    <div class="col-lg-12  p-0">
+
+                        <img src="/media/home-page-image.png" class="img-fluid mt-5" id="wall" width="" height="">
+
+                    </div>
+                    <div class="col-lg-12 p-0" style="background-color: #ECECEC;">
+                        <ul>
+                            <li class="text-dark my-2">
+                                A Django-based Document Management System supporting multi-tenant architecture,
+                                metadata-driven templates, and secure document workflows.
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6 p-5 justify-content-center">
+                <div class="row ">
+                    <div class="justify-content-center text-center col-lg-8 col-sm-12 mt-lg-5 ml-lg-5 pl-5">
+                        {% if messages %}
+                            {% for message in messages %}
+                            <div class="container-fluid p-0">
+                              <div class="alert {{ message.tags }} alert-dismissible" role="alert" >
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                  <span aria-hidden="true">&times;</span>
+                                </button>
+                                {{ message }}
+                              </div>
+                            </div>
+                            {% endfor %}
+                        {% endif %}
+                        {% if form.non_field_errors %}
+                            <p class='form-errors'>
+                                {% for error in form.non_field_errors %}
+                                    <div class="alert alert-danger alert-dismissible" role="alert">
+                                      <button type="button" class="close" data-dismiss="alert">&times;</button>
+                                      <strong>{{ error }}</strong>
+                                    </div>
+                                {% endfor %}
+                            </p>
+                        {% endif %}
+                        <h3 class="mb-4 mt-2">Welcome to DMS</h3>
+                        <form method="POST" action="" autocomplete="off">
+                          {% csrf_token %}
+                            <div class="form-group">
+                                <div class="input-group ">
+                                    <div class="input-group-prepend ">
+                                        <span class="input-group-text">
+                                            <span class="fa fa-user"></span>
+                                        </span>
+                                    </div>
+                                    {{ form.username }}
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text ">
+                                            <span class="fa fa-lock">
+                                            </span>
+                                        </span>
+                                    </div>
+                                    {{ form.password }}
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <div class="row" style="width:100%;display:flex;justify-content:space-between;">
+                                        <div class="col">
+                                            <div class="row">
+                                                <p style="padding:0px;margin:0px;margin-left:20px;" id="show_hide_text_at_login_page">Show password</p>
+                                                <input   style="padding:0px;margin:0px;width:13px;height:13px;margin-left:10px;margin-top:7px;" type="checkbox" onclick="show_hide_passowrd_in_login_page(this)">
+                                            </div>
+                                        </div>
+                                        <div class="col">
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row my-3">
+                                <div class="col">
+                                    <div class="form-check">
+                                        <input type="checkbox" value="lsRememberMe" class="form-check-input" id="rememberMe">
+                                        <label class="form-check-label" for="rememberMe">Remember me</label>
+                                    </div>
+
+                                </div>
+                                <div class="col">
+                                    <div class="form-check float-right">
+                                        <a href="{% url 'password_reset' %}">Forgot password?</a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-block" onclick="lsRememberMe()">Login</button>
+                        </form>
+                    </div>
+
+                    <div class="col-lg-8 text-center pl-5 ml-lg-5 ">
+                        <h6 class="separator text-muted text-sm my-3">OR</h6>
+
+                        <a href="{% url 'register' %}" class="text-bold">Not a member? Register here</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let u = document.getElementById('id_username');
+        let p = document.getElementById('id_password');
+
+        u.classList.add('form-control')
+        u.placeholder = "Enter Username"
+
+        p.classList.add('form-control')
+        p.placeholder = "Enter Password"
+
+        const rmCheck = document.getElementById("rememberMe"),
+            usernameInput = document.getElementById("id_username");
+
+        if (localStorage.checkbox && localStorage.checkbox !== "") {
+          rmCheck.setAttribute("checked", "checked");
+          usernameInput.value = localStorage.username;
+        } else {
+          rmCheck.removeAttribute("checked");
+          usernameInput.value = "";
+        }
+
+        function lsRememberMe() {
+          if (rmCheck.checked && usernameInput.value !== "") {
+            localStorage.username = usernameInput.value;
+            localStorage.checkbox = rmCheck.value;
+          } else {
+            localStorage.username = "";
+            localStorage.checkbox = "";
+          }
+        }
+
+    </script>
+
+    <script>
+        function show_hide_passowrd_in_login_page(cb){
+        if(cb.checked){
+            document.getElementById("show_hide_text_at_login_page").innerText="Hide password";
+            document.getElementById("id_password").type="text";
+        }
+        else{
+            document.getElementById("show_hide_text_at_login_page").innerText="Show password";
+            document.getElementById("id_password").type="password";
+        }
+        }
+
+    </script>
+</body>
+{% endblock content %}
