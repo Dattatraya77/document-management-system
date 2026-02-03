@@ -244,10 +244,8 @@ class TrainingMetaData(LoginRequiredMixin, View):
 
             # Data from UI
             provision_data = json.loads(request.POST['provision_data'])
-            print("provision_data:->",provision_data)
             # Data extracted from DOCX
             meta_session = request.session['metadata']
-            print("meta_session:->", meta_session)
             # Cache existing metadata keys (fast lookup)
             existing_keys = {
                 m.metadata_key: m

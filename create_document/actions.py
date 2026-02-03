@@ -73,8 +73,6 @@ def get_meta_text(template_document, update=[], ui=False):
                     j = 0
                     while '}}' in pre_text_meta or '{{' in pre_text_meta:
                         j += 1
-                        # print("metadata key:->",text)
-                        # print("j:->", j)
                         try:
                             pre_text_meta = ' '.join(text_list[i - j].split()[-2:])
                         except:
@@ -102,11 +100,8 @@ def get_meta_text(template_document, update=[], ui=False):
                     else:
                         pos_text_meta = " ".join(pos_text_list)
                     k = 1
-                    print("pos_text_meta:->", pos_text_meta)
                     while '{{' in pos_text_meta or '}}' in pos_text_meta:
                         k += 1
-                        print("metadata key:->", text)
-                        print("k:->", k)
                         pos_text_meta = ' '.join(text_list[i + k].split()[:1])
 
                     metadata.append({'text': text, 'pre_text': pre_text_meta, 'post_text': pos_text_meta,
@@ -180,11 +175,6 @@ def get_meta_text(template_document, update=[], ui=False):
     if ui:
         return para_text
 
-    # print("metadata:->", metadata)
-    # print("pre_text_list:->", pre_text_list1)
-    # print("post_text_list:->", post_text_list)
-    print("text:->", para_text)
-    print("metadata:->", metadata)
     return {'text': para_text, 'metadata': metadata}
 
 
