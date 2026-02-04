@@ -22,6 +22,7 @@ from .models import Profile
 from django.db import connection
 from django.utils.timezone import now, timedelta
 from django.contrib.sessions.models import Session
+from django.utils.encoding import force_str
 
 
 def get_current_tenant(request):
@@ -100,30 +101,40 @@ class CustomLogoutView(LogoutView):
         return super(CustomLogoutView, self).get(request, *args, **kwargs)
 
 
-def sendEmail(self, request, user_obj, email):
-    user_email_id = email
-    user = user_obj
+def sendEmail(self, request, user, email):
     current_site = get_current_site(request)
-    email_body = {
-        'user': user,
-        'domain': current_site.domain,
-        'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-        'token': account_activation_token.make_token(user),
-    }
-    link = reverse('activate', kwargs={
-        'uidb64': email_body['uid'], 'token': email_body['token']})
+
+    uid = urlsafe_base64_encode(force_bytes(user.pk))
+    token = account_activation_token.make_token(user)
+
+    activation_link = reverse('activate', kwargs={
+        'uidb64': uid,
+        'token': token
+    })
+
+    activate_url = f"https://{current_site.domain}{activation_link}"
+
     email_subject = 'Activate your account'
-    activate_url = 'https://' + current_site.domain + link
-    email = EmailMessage(
-        email_subject,
-        'Hi ' + user.username + ', Please click the link below to activate your account \n' + activate_url,
-        settings.EMAIL_HOST_USER,
-        [user_email_id],
+    email_body = (
+        f"Hi {user.username},\n\n"
+        f"Please click the link below to activate your account:\n\n"
+        f"{activate_url}\n\n"
+        f"Thank you!"
     )
-    email.send(fail_silently=False)
-    messages.success(self.request, 'Account successfully created. Please click on the link that has just been sent to '
-                                   'your email to activate your account.')
-    return messages
+
+    email_message = EmailMessage(
+        email_subject,
+        email_body,
+        settings.DEFAULT_FROM_EMAIL,
+        [email],
+    )
+
+    email_message.send(fail_silently=False)
+
+    messages.success(
+        self.request,
+        'Account created successfully. Please check your email to activate your account.'
+    )
 
 
 class UserRegistrationView(FormView):
@@ -133,79 +144,67 @@ class UserRegistrationView(FormView):
 
     def get(self, request):
         if request.user.is_authenticated:
-            messages.info(request, 'You have already logged into an application. Please logout to register.')
+            messages.info(
+                request,
+                'You are already logged in. Please logout to register a new account.'
+            )
             return redirect('login')
+
         return render(request, self.template_name, {'form': self.form_class()})
 
     def form_valid(self, form):
         email = form.cleaned_data.get('email')
-        cli_email = email.split("@")
-        email_list = [e for e in self.request.tenant.multi_email]
-        email_list_split = [e.split("@") for e in email_list]
-        email_domain_list = []
-        if email_list:
-            for item in email_list_split:
-                email_domain_list.append(item[1])
-            if email_list_split[0][0] == "*" and cli_email[1] in email_domain_list:
-                user = User.objects.create_user(form.cleaned_data['username'], first_name=form.cleaned_data['first_name'],
-                                                last_name=form.cleaned_data['last_name'], email=form.cleaned_data['email'],
-                                                password=form.cleaned_data['password1']
-                                                )
-                user.is_active = False
-                user.save()
-                sendEmail(self, self.request, user, email)
-                return redirect('login')
-            elif email in email_list:
-                user = User.objects.create_user(form.cleaned_data['username'], first_name=form.cleaned_data['first_name'],
-                                                last_name=form.cleaned_data['last_name'], email=form.cleaned_data['email'],
-                                                password=form.cleaned_data['password1']
-                                                )
-                user.is_active = False
-                user.save()
-                sendEmail(self, self.request, user, email)
-                return redirect('login')
-            else:
-                messages.error(self.request, f'Your email is not authorized to register. Please contact your system '
-                                             f'administrator.')
-                context = {
-                    'form': form,
-                    'type': 'register'
-                }
-                context.update(get_current_tenant(self.request))
-                return render(self.request, 'users/register.html', context)
-        else:
-            messages.error(self.request,
-                           f'Client side email not registered. Please contact your system administrator.')
-            context = {
-                'form': form,
-                'type': 'register'
-            }
-            context.update(get_current_tenant(self.request))
-            return render(self.request, 'users/register.html', context)
+
+        # Prevent duplicate email registration
+        if User.objects.filter(email=email).exists():
+            messages.error(self.request, 'This email is already registered.')
+            return render(self.request, self.template_name, {'form': form})
+
+        user = User.objects.create_user(
+            username=form.cleaned_data['username'],
+            first_name=form.cleaned_data['first_name'],
+            last_name=form.cleaned_data['last_name'],
+            email=email,
+            password=form.cleaned_data['password1']
+        )
+
+        user.is_active = False
+        user.save()
+
+        sendEmail(self, self.request, user, email)
+
+        return redirect('login')
 
 
 class VerificationView(View):
     def get(self, request, uidb64, token):
         try:
-            id = force_text(urlsafe_base64_decode(uidb64))
-            user = User.objects.get(pk=id)
-            if not account_activation_token.check_token(user, token):
-                messages.info(request, 'Your account is already activated. Please proceed by logging in to your account.')
-                return redirect('login')
+            user_id = force_str(urlsafe_base64_decode(uidb64))
+            user = User.objects.get(pk=user_id)
+
             if user.is_active:
+                messages.info(request, 'Your account is already activated.')
                 return redirect('login')
+
+            if not account_activation_token.check_token(user, token):
+                messages.error(request, 'Activation link is invalid or expired.')
+                return redirect('login')
+
             user.is_active = True
             user.save()
-            # Add common as User group
-            user.group.add('COMMON')
-            user.save()
-            messages.success(request, 'Thanks ' + user.username + ' for verifying your email address. Your account '
-                                                                  'is now activated. You may proceed to login.')
+
+            # Optional: add default group
+            # user.groups.add(Group.objects.get(name='COMMON'))
+
+            messages.success(
+                request,
+                'Your account has been activated successfully. You can now log in.'
+            )
             return redirect('login')
-        except Exception as ex:
-            pass
-        # messages.success(request, 'Your Account already activated successfully')
-        return redirect('login')
+
+        except Exception:
+            messages.error(request, 'Invalid activation link.')
+            return redirect('login')
 
 
 @login_required
