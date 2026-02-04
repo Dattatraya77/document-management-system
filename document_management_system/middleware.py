@@ -20,7 +20,7 @@ class TenantTutorialMiddleware(MiddlewareMixin):
             request.urlconf = settings.PUBLIC_SCHEMA_URLCONF
             return
         except get_tenant_domain_model().DoesNotExist:
-            if hostname_without_port in ("127.0.0.1", "localhost", "reliance.local", "solviti.me", "solviti.com"):
+            if hostname_without_port in ("127.0.0.1", "localhost", "reliance.local", "document-management-system-kib5.onrender.com"):
                 request.urlconf = settings.PUBLIC_SCHEMA_URLCONF
                 return
             else:

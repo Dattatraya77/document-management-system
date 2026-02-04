@@ -1,12 +1,10 @@
-# Database
-# https://docs.djangoproject.com/en/2.1/ref/settings/#databases
+import dj_database_url
+from decouple import config
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django_tenants.postgresql_backend',
-        "NAME": 'DMS_DB',
-        'USER': 'dattatraya77',
-        'PASSWORD': 'hello2020',
-    }
+    "default": dj_database_url.parse(
+        config("DATABASE_URL"),
+        engine="django_tenants.postgresql_backend"
+    )
 }
 
