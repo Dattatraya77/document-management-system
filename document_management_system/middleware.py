@@ -4,30 +4,31 @@ from django.db import connection
 from django.http import Http404
 from django.utils.deprecation import MiddlewareMixin
 from django_tenants.utils import remove_www_and_dev, get_public_schema_name, get_tenant_domain_model
-from django.db import utils
 
 
 class TenantTutorialMiddleware(MiddlewareMixin):
 
     def process_request(self, request):
-
         connection.set_schema_to_public()
-        hostname_without_port = remove_www_and_dev(request.get_host().split(':')[0])
+
+        hostname = remove_www_and_dev(request.get_host().split(':')[0])
+
         try:
-            domain = get_tenant_domain_model().objects.get(domain=hostname_without_port)
+            domain = get_tenant_domain_model().objects.get(domain=hostname)
             request.tenant = domain.tenant
-        except utils.DatabaseError:
-            request.urlconf = settings.PUBLIC_SCHEMA_URLCONF
-            return
         except get_tenant_domain_model().DoesNotExist:
-            if hostname_without_port in ("127.0.0.1", "localhost", "reliance.local", "document-management-system-kib5.onrender.com"):
+            if hostname in (
+                "127.0.0.1",
+                "localhost",
+                "reliance.local",
+                "document-management-system-kib5.onrender.com",
+            ):
                 request.urlconf = settings.PUBLIC_SCHEMA_URLCONF
                 return
-            else:
-                raise Http404
+            raise Http404
+
         connection.set_tenant(request.tenant)
         ContentType.objects.clear_cache()
 
-        if hasattr(settings, 'PUBLIC_SCHEMA_URLCONF') and request.tenant.schema_name == get_public_schema_name():
+        if request.tenant.schema_name == get_public_schema_name():
             request.urlconf = settings.PUBLIC_SCHEMA_URLCONF
-

@@ -1,5 +1,5 @@
 
-
+# LOCAL Postgres Database settings
 
 DATABASES = {
     'default': {

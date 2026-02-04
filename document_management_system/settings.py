@@ -19,11 +19,13 @@ from decouple import config
 from pathlib import Path
 
 
-try:
+ENVIRONMENT = config("ENVIRONMENT", default="local")
+
+if ENVIRONMENT == "local":
     from .local_setting import *
-except Exception as e:
-    print(e, "Project is running on Server")
+else:
     from .server_setting import *
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 # BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -216,3 +218,4 @@ MESSAGE_TAGS = {
  }
 
 
+PUBLIC_SCHEMA_URLCONF = 'document_management_system.urls_public'
