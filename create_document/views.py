@@ -16,7 +16,7 @@ from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.shortcuts import render
-from django.views import View
+from django.views import View, generic
 from django.views.generic.list import ListView
 from django.contrib.auth.models import Group, User
 from document_management_system.settings import MEDIA_ROOT
@@ -525,4 +525,47 @@ class CreateNewDocumentTemplate(LoginRequiredMixin, View):
         tpl.save(output_path)
 
         messages.success(request, "Document created successfully")
-        return redirect("templates-to-doc")
+        return redirect("new-document-list")
+
+
+class NewDocumentList(LoginRequiredMixin, generic.ListView):
+    template_name = 'newDocuments.html'
+    context_object_name = 'new_document_list'
+
+    def get_queryset(self):
+        user = self.request.user
+        common_group = get_object_or_404(Group, name='COMMON')
+        admin_group = get_object_or_404(Group, name='DOC_ADMIN')
+        if admin_group in user.groups.all():
+            documents = CreatedDocument.objects.filter(status='ac', doc_type='docx') \
+                .order_by('-doc_updated_on').distinct()
+            for doc in documents:
+                doc.notified = user in doc.notification_list.all()
+            return documents
+
+        documents = CreatedDocument.objects.filter(Q(doc_group__in=user.groups.all()) |
+                                               Q(doc_group__in=[common_group]) |
+                                               Q(doc_created_by=user)) \
+            .filter(status='ac', doc_type='docx') \
+            .order_by('-doc_updated_on').distinct()
+        return documents
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        user = self.request.user
+        context = super().get_context_data(**kwargs)
+        context['client_name'] = connection.tenant.name
+        time_zone = get_object_or_404(Profile, user=self.request.user).client_tz
+        context['time_zone'] = time_zone
+        context['users'] = User.objects.all()
+        context['user'] = user
+        context['time_zone'] = time_zone
+        return context
+
+
+class DeleteDocxDocument(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        document = get_object_or_404(CreatedDocument, doc_id=kwargs["doc_id"])
+        document.status = 'de'
+        document.save()
+        messages.success(request, "Created Document ID(" + document.doc_id + ") deleted successfully.")
+        return redirect('new-document-list')

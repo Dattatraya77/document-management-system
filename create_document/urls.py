@@ -14,6 +14,8 @@ urlpatterns = [
     url(r'^delete-template/(?P<template_id>.*)/$', views.DeleteTemplate.as_view(), name='delete-template'),
     url(r'^templates-to-doc/$', views.TemplatesToDoc.as_view(), name='templates-to-doc'),
     url(r'^create-document-template/(?P<template_id>.*)/$', views.CreateNewDocumentTemplate.as_view(), name='createDocumentTemplate'),
+    url(r'^new-document-list/$', views.NewDocumentList.as_view(), name='new-document-list'),
+    url(r'^delete-docx-document/(?P<doc_id>.*)/$', views.DeleteDocxDocument.as_view(), name='delete-docx-document'),
 ]
 
 

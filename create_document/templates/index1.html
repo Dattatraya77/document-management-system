@@ -237,9 +237,6 @@
                                                 <button title="Download Template" class="btn btn-outline-secondary btn-group px-2" onclick="downloadURI('{{ template.template }}','{{ template.temp_id }}')">
                                                     <img src="/static/images/ms-word.png" width="20" height="20"/>
                                                 </button>
-                                                <button type="button" title="View Template" class="btn btn-outline-secondary btn-sm" onclick="set_preview('{{ template.template.url }}','{{ template.temp_id }}')">
-                                                    <img src="/static/images/view-file.png" width="20" height="20"/>
-                                                </button>
                                                 <button title="More Action" class="btn btn-outline-secondary btn-sm" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><i class="fas fa-ellipsis-v"></i></button>
                                                 <div class="dropdown-menu dropdown-content">
                                                     <a class="dropdown-item" title="Delete Template" href="" data-toggle="modal" data-target="#{{ template.temp_id }}"><i class="fa fa-trash btn-outline-danger"></i><span class="pl-2"><sub>Delete</sub></span></a>
