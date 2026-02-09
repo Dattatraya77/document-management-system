@@ -210,13 +210,6 @@
         border:0px !important;
       }
     }
-    .default-home-page-btn {
-        padding:0.25rem 0.5rem;
-        line-height:1.0rem;
-        border-radius:0.5rem;
-        font-size: 13px;
-    }
-
 </style>
 
 <div class="container">
@@ -323,61 +316,12 @@
         </div>
     </div>
 </div>
-
-    <!--  Modals for signature  -->
-        <div class="modal fade" id="singDocuemntModal" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title" id="exampleModalLabel">Document Signature</h5>
-                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                  </button>
-                </div>
-                <div class="modal-body">
-                  <div class="row">
-                    <div class="col-12" id="pm_error">
-
-                    </div>
-                    <div class="col-12">
-                      <div class="form-group">
-                        <label >Number of parties</label>
-                        <input type="number" id="partySelection" class="form-control" min="1" max="4" placeholder="Enter number of parties">
-                      </div>
-                    </div>
-
-                    <div class="col-12">
-                      <form action="#" id="partSignatureForm">
-                          {% csrf_token %}
-                          <input type="hidden" disabled="" name="documentId" id="currentDocumentId">
-                          <div id="partSignatureFormBody"></div>
-                      </form>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-        </div>
 {% endblock %}
 
 {% block extracode %}
-<!--    <script src="{% static 'custom/js/signature.js' %}?version=7" type="text/javascript"></script>-->
-    <script src="{% static 'custom/js/digital_signature.js' %}?version=8" type="text/javascript"></script>
-    <script src="{% static 'custom/js/edit_metadata.js' %}?version=7" type="text/javascript"></script>
     <script src="{% static 'custom/js/download_view_document.js' %}?version=7" type="text/javascript"></script>
-    <script src="{% static 'custom/js/document_History.js' %}?version=7" type="text/javascript"></script>
-    <script src="{% static 'custom/js/replace_document.js' %}?version=7" type="text/javascript"></script>
-    <script src="{% static 'custom/js/docx_duplicate_documents.js' %}?version=7" type="text/javascript"></script>
-    <script src="{% static 'custom/js/default_home_page_after_login.js' %}?version=1" type="text/javascript"></script>
-    <script src="{% static 'custom/js/rename_file.js' %}?version=2" type="text/javascript"></script>
-    <script src="{% static 'custom/js/delete_multiple_files_from_table.js' %}?version=1" type="text/javascript"></script>
-    <script src="{% static 'custom/js/Convert_DLFs_Pdf.js' %}?version=1" type="text/javascript"></script>
 {% endblock %}
 
 {% block extrajs %}
- <script src="{% static 'custom/js/send_whatsapp_message.js' %}?version=8" type="text/javascript"></script>
- <script src="{% static 'custom/js/send_email.js' %}?version=7" type="text/javascript"></script>
- <script src="{% static 'custom/js/workflow.js' %}?version=7" type="text/javascript"></script>
- <script src="{% static 'custom/js/notifications.js' %}?version=7" type="text/javascript"></script>
- <script src="{% static 'custom/js/attach_file_from_server.js' %}?version=8" type="text/javascript"></script>
+
 {% endblock %}

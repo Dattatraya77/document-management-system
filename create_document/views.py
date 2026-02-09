@@ -539,8 +539,6 @@ class NewDocumentList(LoginRequiredMixin, generic.ListView):
         if admin_group in user.groups.all():
             documents = CreatedDocument.objects.filter(status='ac', doc_type='docx') \
                 .order_by('-doc_updated_on').distinct()
-            for doc in documents:
-                doc.notified = user in doc.notification_list.all()
             return documents
 
         documents = CreatedDocument.objects.filter(Q(doc_group__in=user.groups.all()) |
