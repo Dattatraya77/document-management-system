@@ -43,7 +43,7 @@ SECRET_KEY = config("SECRET_KEY")
 DEBUG = config("DEBUG", cast=bool)
 
 ALLOWED_HOSTS = config("ALLOWED_HOSTS").split(",")
-
+CSRF_TRUSTED_ORIGINS=["https://document-management-system-production-a2b8.up.railway.app/",]
 
 # Application definition
 
