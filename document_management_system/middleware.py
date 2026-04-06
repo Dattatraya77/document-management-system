@@ -21,7 +21,7 @@ class TenantTutorialMiddleware(MiddlewareMixin):
                 "127.0.0.1",
                 "localhost",
                 "reliance",
-                "34.14.200.138:8000",
+                "34.14.200.138",
             ):
                 request.urlconf = settings.PUBLIC_SCHEMA_URLCONF
                 return
