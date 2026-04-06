@@ -20,8 +20,8 @@ class TenantTutorialMiddleware(MiddlewareMixin):
             if hostname in (
                 "127.0.0.1",
                 "localhost",
-                "reliance.local",
-                "document-management-system-kib5.onrender.com",
+                "reliance",
+                "34.14.200.138:8000",
             ):
                 request.urlconf = settings.PUBLIC_SCHEMA_URLCONF
                 return
