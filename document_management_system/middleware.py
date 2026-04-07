@@ -21,8 +21,8 @@ class TenantTutorialMiddleware(MiddlewareMixin):
                 "127.0.0.1",
                 "localhost",
                 "reliance",
-                "34.14.200.138",
-            ):
+                "34.122.136.242",
+            ) or hostname.endswith(".nip.io"):
                 request.urlconf = settings.PUBLIC_SCHEMA_URLCONF
                 return
             raise Http404
